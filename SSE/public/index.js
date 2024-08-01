@@ -18,12 +18,37 @@ sseDataOnly.addEventListener("click", async () => {
   sseDataOnlySpinner.style.display = "block";
   sseDataOnlyOutput.innerHTML = "";
 
+  const eventSource = new EventSource(`${baseUrl}/sse/data-only`);
+  eventSource.onmessage = (event) => {
+    if (!event.data) {
+      eventSource.close();
+      sseDataOnlySpinner.style.display = "";
+      return;
+    }
+
+    sseDataOnlyOutput.innerHTML += `${event.data}\n`;
+  };
+
 });
 
 sseCustomEvents.addEventListener("click", async () => {
   sseCustomEventsSpinner.style.display = "block";
   sseCustomEventsOutput.innerHTML = "";
 
+  const eventSource = new EventSource(`${baseUrl}/sse/custom-events`);
+
+  eventSource.addEventListener("even", event => {
+    sseCustomEventsOutput.innerHTML += `EVEN: ${JSON.parse(event.data).value}\n`;
+  });
+
+  eventSource.addEventListener("odd", event => {
+    sseCustomEventsOutput.innerHTML += `ODD: ${JSON.parse(event.data).value}\n`;
+  });
+
+  eventSource.addEventListener("eom", () => {
+    eventSource.close();
+    sseCustomEventsSpinner.style.display = "";
+  });
 });
 
 openai.addEventListener("click", async () => {
