@@ -56,4 +56,16 @@ openai.addEventListener("click", async () => {
   openaiOutput.innerHTML = "";
   openaiOutput.style.display = "block";
 
+  const eventSource = new EventSource(`${baseUrl}/openai/train-cat`);
+  eventSource.onmessage = (event) => {
+    if (!event.data) {
+      eventSource.close();
+      return;
+    }
+
+    markdown += `${JSON.parse(event.data)}`;
+    openaiOutput.innerHTML = marked(markdown);
+
+    window.scrollTo(0, document.body.scrollHeight);
+  };
 });

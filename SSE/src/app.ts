@@ -2,6 +2,7 @@ import express from "express";
 import logger from "./logging.js";
 import cors from "cors";
 import sse from "./server-sent-events.js";
+import * as openai from "./openai.js";
 
 const app = express();
 
@@ -13,6 +14,8 @@ app.use(cors());
 app.use(express.static("public"));
 
 app.use("/sse", sse);
+const assistant = await openai.createOrUpdateAssistant();
+app.use("/openai", openai.route(assistant));
 
 const PORT = process.env["PORT"] || 3000;
 app.listen(PORT, () => {
